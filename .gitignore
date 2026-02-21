@@ -1,15 +1,18 @@
+# Android build output
+build/
+app/build/
+
+# Gradle
+.gradle/
+gradle-wrapper.jar
+
+# Android Studio IDE files
+.idea/
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+shelf/
+workspace.xml
 local.properties
+
+# Keystore files (never commit these)
+*.jks
+*.keystore

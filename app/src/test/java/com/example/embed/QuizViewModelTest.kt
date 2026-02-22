@@ -44,7 +44,10 @@ class QuizViewModelTest {
     fun `wrong answer decreases score by 5`() {
         val viewModel = QuizViewModel(getTestQuestions())
         viewModel.submitAnswer(3)
+        viewModel.advance()
+
         viewModel.submitAnswer(0)
+        viewModel.advance()
 
         assertEquals(5, viewModel.score)
     }
@@ -61,7 +64,10 @@ class QuizViewModelTest {
     fun `streak increments`() {
         val viewModel = QuizViewModel(getTestQuestions())
         viewModel.submitAnswer(3)
+        viewModel.advance()
+
         viewModel.submitAnswer(2)
+        viewModel.advance()
 
         assertEquals(2, viewModel.streak)
     }
@@ -70,8 +76,13 @@ class QuizViewModelTest {
     fun `streak resets`() {
         val viewModel = QuizViewModel(getTestQuestions())
         viewModel.submitAnswer(3)
+        viewModel.advance()
+
         viewModel.submitAnswer(2)
+        viewModel.advance()
+
         viewModel.submitAnswer(3)
+        viewModel.advance()
 
         assertEquals(0, viewModel.streak)
     }
@@ -80,8 +91,13 @@ class QuizViewModelTest {
     fun `streak keeps highest streak`() {
         val viewModel = QuizViewModel(getTestQuestions())
         viewModel.submitAnswer(3)
+        viewModel.advance()
+
         viewModel.submitAnswer(2)
+        viewModel.advance()
+
         viewModel.submitAnswer(3)
+        viewModel.advance()
 
         assertEquals(2, viewModel.highestStreak)
     }
@@ -96,7 +112,10 @@ class QuizViewModelTest {
     fun `finished is false mid-quiz`() {
         val viewModel = QuizViewModel(getTestQuestions())
         viewModel.submitAnswer(3)
+        viewModel.advance()
+
         viewModel.submitAnswer(2)
+        viewModel.advance()
 
         assertEquals(false, viewModel.isFinished)
     }
@@ -105,9 +124,16 @@ class QuizViewModelTest {
     fun `finished is true when done`() {
         val viewModel = QuizViewModel(getTestQuestions())
         viewModel.submitAnswer(3)
+        viewModel.advance()
+
         viewModel.submitAnswer(2)
+        viewModel.advance()
+
         viewModel.submitAnswer(3)
+        viewModel.advance()
+
         viewModel.submitAnswer(2)
+        viewModel.advance()
 
         assertEquals(true, viewModel.isFinished)
     }
@@ -116,10 +142,29 @@ class QuizViewModelTest {
     fun `correct answer count increments properly`() {
         val viewModel = QuizViewModel(getTestQuestions())
         viewModel.submitAnswer(3)
+        viewModel.advance()
+
         viewModel.submitAnswer(2)
+        viewModel.advance()
+
         viewModel.submitAnswer(0)
+        viewModel.advance()
+
         viewModel.submitAnswer(0)
+        viewModel.advance()
 
         assertEquals(3, viewModel.correctAnswers)
+    }
+
+    @Test
+    fun `can't select after submission`() {
+        val viewModel = QuizViewModel(getTestQuestions())
+        viewModel.submitAnswer(3)
+        val previousSelectedAnswerIndex = viewModel.selectedAnswerIndex
+
+        viewModel.submitAnswer(2)
+        val currentSelectedAnswerIndex = viewModel.selectedAnswerIndex
+
+        assertEquals(previousSelectedAnswerIndex, currentSelectedAnswerIndex)
     }
 }

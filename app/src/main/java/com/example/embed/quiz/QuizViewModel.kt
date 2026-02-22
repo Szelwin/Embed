@@ -1,5 +1,9 @@
 package com.example.embed.quiz
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.embed.data.Question
@@ -8,14 +12,25 @@ import com.example.embed.data.SessionRecord
 class QuizViewModel(
     private val questions: List<Question>
 ) : ViewModel() {
-    private var currentIndex = 0
-    var score = 0
+    var currentIndex by mutableIntStateOf(0)
         private set
-    var streak = 0
+
+    var selectedAnswerIndex by mutableIntStateOf(-1)
         private set
-    var highestStreak = 0
+
+    var answered by mutableStateOf(false)
         private set
-    var correctAnswers = 0
+
+    var score by mutableIntStateOf(0)
+        private set
+
+    var streak by mutableIntStateOf(0)
+        private set
+
+    var highestStreak by mutableIntStateOf(0)
+        private set
+
+    var correctAnswers by mutableIntStateOf(0)
         private set
 
     val isFinished: Boolean
@@ -24,7 +39,15 @@ class QuizViewModel(
     fun currentQuestion(): Question? =
         questions.getOrNull(currentIndex)
 
+    // Step 1 of 2: user taps an answer card.
+    // Records the selection and scores it, but does NOT advance yet.
     fun submitAnswer(selectedIndex: Int) {
+        // Ignore submitting after question is already answered
+        if (answered) return
+
+        selectedAnswerIndex = selectedIndex
+        answered = true
+
         val correctIndex = currentQuestion()?.correctIndex
         val correct = selectedIndex == correctIndex
 
@@ -39,7 +62,13 @@ class QuizViewModel(
             score = maxOf(0, score - 5)
             streak = 0
         }
+    }
 
+    // Step 2 of 2: user taps Next.
+    // Resets per-question state and moves forward.
+    fun advance() {
+        selectedAnswerIndex = -1
+        answered = false
         currentIndex += 1
     }
 

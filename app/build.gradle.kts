@@ -65,4 +65,7 @@ dependencies {
 
     // Viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+
+    // Compose test dep for Espresso instrumented testing
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 }

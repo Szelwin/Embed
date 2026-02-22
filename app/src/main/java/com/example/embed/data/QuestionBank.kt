@@ -1,5 +1,7 @@
 package com.example.embed.data
 
+import com.example.embed.srs.CardState
+
 /**
  * In-memory repository of all quiz questions.
  *

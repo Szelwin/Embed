@@ -1,5 +1,6 @@
 package com.example.embed
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,7 +39,15 @@ class QuizActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     QuizScreen(
                         vm = vm,
-                        onSessionFinished = { finish() }
+                        onSessionFinished = {
+                            val record = vm.toSessionRecord()
+
+                            val intent = Intent(this@QuizActivity, ResultActivity::class.java).apply {
+                                putExtra("record", record)
+                            }
+
+                            startActivity(intent)
+                        }
                     )
                 }
             }

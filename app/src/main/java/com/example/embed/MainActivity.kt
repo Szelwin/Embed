@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.embed.ui.theme.EmbedTheme
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +40,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -53,7 +57,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(320.dp))
 
         Button(
-            onClick = { /* TODO: navigate to quiz */ },
+            onClick = {
+                context.startActivity(Intent(context, QuizActivity::class.java))
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Start")

@@ -30,6 +30,10 @@
             android:name=".ResultActivity"
             android:theme="@style/Theme.Embed"
         />
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/Theme.Embed"
+        />
     </application>
 
 </manifest>

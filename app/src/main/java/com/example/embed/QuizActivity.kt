@@ -21,6 +21,7 @@ import com.example.embed.data.Question
 import com.example.embed.data.QuestionBank
 import com.example.embed.quiz.QuizViewModel
 import com.example.embed.quiz.QuizViewModelFactory
+import com.example.embed.settings.SettingsManager
 import com.example.embed.ui.theme.EmbedTheme
 import kotlin.getValue
 
@@ -29,7 +30,17 @@ enum class AnswerCardState { DEFAULT, CORRECT, WRONG }
 class QuizActivity : ComponentActivity() {
 
     private val vm: QuizViewModel by viewModels {
-        QuizViewModelFactory(QuestionBank.all.shuffled().take(10))
+        /* TODO use the algorithm here */
+        val settingsManager = SettingsManager(this)
+        val enabledDomains = settingsManager.enabledDomains
+        val questionCount = settingsManager.questionsPerSession
+
+        val questions = QuestionBank.all
+            .filter { it.domain in enabledDomains }
+            .shuffled()
+            .take(questionCount)
+
+        QuizViewModelFactory(questions)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

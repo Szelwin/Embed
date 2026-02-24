@@ -77,7 +77,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { /* TODO: navigate to settings */ },
+            onClick = {
+                context.startActivity(Intent(context, SettingsActivity::class.java))
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Settings")

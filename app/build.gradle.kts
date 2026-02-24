@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.core.ktx)
+    implementation(libs.androidx.compose.foundation.layout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,4 +70,10 @@ dependencies {
 
     // Compose test dep for Espresso instrumented testing
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+    // Simulate android env in java, faster unit tests (no emulator)
+    testImplementation("org.robolectric:robolectric:4.14.1")
+
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("androidx.compose.ui:ui-test-manifest")
 }

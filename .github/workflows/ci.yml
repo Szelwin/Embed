@@ -82,8 +82,24 @@ jobs:
         with:
           api-level: 30
           arch: x86_64
+          profile: pixel_6
+          disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: ./gradlew connectedDebugAndroidTest
+          script: |
+            ./gradlew connectedDebugAndroidTest; TEST_RESULT=$?
+            adb exec-out screencap -p > emulator-screenshot.png || true
+            adb logcat -d > logcat.txt || true
+            exit $TEST_RESULT
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: |
+            app/build/reports/androidTests/
+            emulator-screenshot.png
+            logcat.txt
 
   # ── Job 3: Signed release APK (only on main push) ──────────
   release-build:

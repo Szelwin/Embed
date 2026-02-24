@@ -68,7 +68,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { /* TODO: navigate to history */ },
+            onClick = {
+                context.startActivity(Intent(context, HistoryActivity::class.java))
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Score History")

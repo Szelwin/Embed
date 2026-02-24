@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.example.embed.data.Question
 import com.example.embed.data.QuestionBank
+import com.example.embed.db.AppDatabase
+import com.example.embed.db.CardRepository
 import com.example.embed.quiz.QuizViewModel
 import com.example.embed.quiz.QuizViewModelFactory
 import com.example.embed.settings.SettingsManager
@@ -30,17 +32,16 @@ enum class AnswerCardState { DEFAULT, CORRECT, WRONG }
 class QuizActivity : ComponentActivity() {
 
     private val vm: QuizViewModel by viewModels {
-        /* TODO use the algorithm here */
         val settingsManager = SettingsManager(this)
         val enabledDomains = settingsManager.enabledDomains
         val questionCount = settingsManager.questionsPerSession
 
-        val questions = QuestionBank.all
-            .filter { it.domain in enabledDomains }
-            .shuffled()
-            .take(questionCount)
+        val allQuestions = QuestionBank.all.filter { it.domain in enabledDomains }
 
-        QuizViewModelFactory(questions)
+        val db = AppDatabase.getInstance(this)
+        val cardRepository = CardRepository(db.cardStateDao())
+
+        QuizViewModelFactory(allQuestions, questionCount, cardRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +69,13 @@ class QuizActivity : ComponentActivity() {
 
 @Composable
 fun QuizScreen(vm: QuizViewModel, onSessionFinished: () -> Unit) {
+    if (vm.loading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
     val question = vm.currentQuestion() ?: return
 
     Column(

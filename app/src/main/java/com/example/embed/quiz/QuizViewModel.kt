@@ -6,12 +6,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.embed.data.Question
 import com.example.embed.data.SessionRecord
+import com.example.embed.db.CardRepository
+import com.example.embed.srs.CardState
+import com.example.embed.srs.SpacedRepetitionEngine
+import kotlinx.coroutines.launch
 
 class QuizViewModel(
-    private val questions: List<Question>
+    allQuestions: List<Question>,
+    sessionLength: Int = allQuestions.size,
+    private val cardRepository: CardRepository? = null
 ) : ViewModel() {
+
+    var questions by mutableStateOf<List<Question>>(emptyList())
+        private set
+
+    var loading by mutableStateOf(true)
+        private set
+
     var currentIndex by mutableIntStateOf(0)
         private set
 
@@ -34,7 +48,20 @@ class QuizViewModel(
         private set
 
     val isFinished: Boolean
-        get() = currentIndex >= questions.size
+        get() = !loading && currentIndex >= questions.size
+
+    init {
+        if (cardRepository != null) {
+            viewModelScope.launch {
+                val cardStates = cardRepository.loadAll()
+                questions = SessionBuilder(allQuestions, cardStates, sessionLength).buildSession()
+                loading = false
+            }
+        } else {
+            questions = allQuestions
+            loading = false
+        }
+    }
 
     fun currentQuestion(): Question? =
         questions.getOrNull(currentIndex)
@@ -48,8 +75,8 @@ class QuizViewModel(
         selectedAnswerIndex = selectedIndex
         answered = true
 
-        val correctIndex = currentQuestion()?.correctIndex
-        val correct = selectedIndex == correctIndex
+        val question = currentQuestion() ?: return
+        val correct = selectedIndex == question.correctIndex
 
         if (correct) {
             score += 10
@@ -61,6 +88,19 @@ class QuizViewModel(
         else {
             score = maxOf(0, score - 5)
             streak = 0
+        }
+
+        if (cardRepository != null) {
+            viewModelScope.launch {
+                val existing = cardRepository.load(question.id)
+                val card = existing ?: CardState(questionId = question.id)
+                val updated = if (correct) {
+                    SpacedRepetitionEngine.onCorrect(card)
+                } else {
+                    SpacedRepetitionEngine.onWrong(card)
+                }
+                cardRepository.save(updated)
+            }
         }
     }
 
@@ -84,10 +124,12 @@ class QuizViewModel(
 }
 
 class QuizViewModelFactory(
-    private val questions: List<Question>
+    private val allQuestions: List<Question>,
+    private val sessionLength: Int,
+    private val cardRepository: CardRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return QuizViewModel(questions) as T
+        return QuizViewModel(allQuestions, sessionLength, cardRepository) as T
     }
 }

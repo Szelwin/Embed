@@ -7,7 +7,7 @@ import com.example.embed.ui.theme.EmbedTheme
 import org.junit.Rule
 import org.junit.Test
 
-class ResultScreenTest {
+class ResultActivityTest {
 
     @get:Rule
     val composeRule = createComposeRule()
